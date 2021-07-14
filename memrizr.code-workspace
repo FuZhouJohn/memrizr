@@ -1,0 +1,12 @@
+{
+    "folders": [
+        {
+            "name": "account",
+            "path": "account"
+        },
+        {
+            "name": "memrizr",
+            "path": "."
+        }
+    ]
+}
