@@ -9,16 +9,17 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/FuZhouJohn/memrizr/handler"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	log.Println("服务正在启动...")
+
 	router := gin.Default()
 
-	router.GET("/api/v1/account", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"hello": "world",
-		})
+	handler.NewHandler(&handler.Config{
+		R: router,
 	})
 
 	srv := &http.Server{
