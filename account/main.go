@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/FuZhouJohn/memrizr/handler"
+	"github.com/FuZhouJohn/memrizr/account/handler"
 	"github.com/gin-gonic/gin"
 )
 

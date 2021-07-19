@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/FuZhouJohn/memrizr/model"
+	"github.com/FuZhouJohn/memrizr/account/model"
 	"github.com/gin-gonic/gin"
 )
 

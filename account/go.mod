@@ -1,4 +1,4 @@
-module github.com/FuZhouJohn/memrizr
+module github.com/FuZhouJohn/memrizr/account
 
 go 1.16
 

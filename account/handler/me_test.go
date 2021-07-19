@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/FuZhouJohn/memrizr/model"
-	"github.com/FuZhouJohn/memrizr/model/apperrors"
-	"github.com/FuZhouJohn/memrizr/model/mocks"
+	"github.com/FuZhouJohn/memrizr/account/model"
+	"github.com/FuZhouJohn/memrizr/account/model/apperrors"
+	"github.com/FuZhouJohn/memrizr/account/model/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
