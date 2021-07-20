@@ -27,3 +27,14 @@ func (m *MockUserRespository) FindByID(ctx context.Context, uid uuid.UUID) (*mod
 
 	return r0, r1
 }
+
+func (m *MockUserRespository) Create(ctx context.Context, u *model.User) error {
+	ret := m.Called(ctx, u)
+
+	var r0 error
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(error)
+	}
+
+	return r0
+}
