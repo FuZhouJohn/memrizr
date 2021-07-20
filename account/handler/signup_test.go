@@ -268,5 +268,6 @@ func TestSignup(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		assert.Equal(t, respBody, rr.Body.Bytes())
 		mockUserService.AssertExpectations(t)
+		mockTokenService.AssertExpectations(t)
 	})
 }
