@@ -38,7 +38,7 @@ func (s *UserService) Signup(ctx context.Context, u *model.User) error {
 
 	u.Password = pw
 
-	if err := s.UserRepository.Creat(ctx, u); err != nil {
+	if err := s.UserRepository.Create(ctx, u); err != nil {
 		return err
 	}
 
