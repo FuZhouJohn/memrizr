@@ -171,4 +171,102 @@ func TestSignup(t *testing.T) {
 		assert.Equal(t, http.StatusConflict, rr.Code)
 		mockUserService.AssertExpectations(t)
 	})
+
+	t.Run("创建令牌成功", func(t *testing.T) {
+		u := &model.User{
+			Email:    "hello@world.com",
+			Password: "testpassword",
+		}
+
+		mockTokenResp := &model.TokenPair{
+			IDToken:      "IDToken",
+			RefreshToken: "RefreshToken",
+		}
+
+		mockUserService := new(mocks.MockUserService)
+		mockTokenService := new(mocks.MockTokenService)
+
+		mockUserService.On("Signup", mock.AnythingOfType("*gin.Context"), u).Return(nil)
+		mockTokenService.On("NewPairFromUser", mock.AnythingOfType("*gin.Context"), u, "").Return(mockTokenResp, nil)
+
+		rr := httptest.NewRecorder()
+
+		router := gin.Default()
+
+		NewHandler(&Config{
+			R:            router,
+			UserService:  mockUserService,
+			TokenService: mockTokenService,
+		})
+
+		reqBody, err := json.Marshal(gin.H{
+			"email":    u.Email,
+			"password": u.Password,
+		})
+		assert.NoError(t, err)
+
+		request, err := http.NewRequest(http.MethodPost, "/signup", bytes.NewBuffer(reqBody))
+		assert.NoError(t, err)
+
+		request.Header.Set("Content-Type", "application/json")
+
+		router.ServeHTTP(rr, request)
+
+		respBody, err := json.Marshal(gin.H{
+			"tokens": mockTokenResp,
+		})
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusCreated, rr.Code)
+		assert.Equal(t, respBody, rr.Body.Bytes())
+		mockUserService.AssertExpectations(t)
+		mockTokenService.AssertExpectations(t)
+	})
+
+	t.Run("创建令牌失败", func(t *testing.T) {
+		u := &model.User{
+			Email:    "hello@world.com",
+			Password: "testpassword",
+		}
+
+		mockErrorResponse := apperrors.NewInternal()
+
+		mockUserService := new(mocks.MockUserService)
+		mockTokenService := new(mocks.MockTokenService)
+
+		mockUserService.On("Signup", mock.AnythingOfType("*gin.Context"), u).Return(nil)
+		mockTokenService.On("NewPairFromUser", mock.AnythingOfType("*gin.Context"), u, "").Return(nil, mockErrorResponse)
+
+		rr := httptest.NewRecorder()
+
+		router := gin.Default()
+
+		NewHandler(&Config{
+			R:            router,
+			UserService:  mockUserService,
+			TokenService: mockTokenService,
+		})
+
+		reqBody, err := json.Marshal(gin.H{
+			"email":    u.Email,
+			"password": u.Password,
+		})
+		assert.NoError(t, err)
+
+		request, err := http.NewRequest(http.MethodPost, "/signup", bytes.NewBuffer(reqBody))
+		assert.NoError(t, err)
+
+		request.Header.Set("Content-Type", "application/json")
+
+		router.ServeHTTP(rr, request)
+
+		respBody, err := json.Marshal(gin.H{
+			"error": mockErrorResponse,
+		})
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, respBody, rr.Body.Bytes())
+		mockUserService.AssertExpectations(t)
+	})
 }

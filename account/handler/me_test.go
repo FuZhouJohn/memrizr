@@ -19,7 +19,7 @@ import (
 func TestMe(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("成功", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserResp := &model.User{
@@ -61,7 +61,7 @@ func TestMe(t *testing.T) {
 
 	})
 
-	t.Run("NoContextUser", func(t *testing.T) {
+	t.Run("上下文中没有 User", func(t *testing.T) {
 		// handler 中直接被返回，因为没有 uid
 		mockUserService := new(mocks.MockUserService)
 		mockUserService.On("Get", mock.Anything, mock.Anything).Return(nil, nil)
@@ -83,7 +83,7 @@ func TestMe(t *testing.T) {
 		mockUserService.AssertNotCalled(t, "Get", mock.Anything)
 	})
 
-	t.Run("NotFound", func(t *testing.T) {
+	t.Run("未查找到", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserService := new(mocks.MockUserService)
