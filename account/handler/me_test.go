@@ -45,7 +45,7 @@ func TestMe(t *testing.T) {
 			UserService: mockUserService,
 		})
 
-		request, err := http.NewRequest(http.MethodGet, "/v1/me", nil)
+		request, err := http.NewRequest(http.MethodGet, "/me", nil)
 		assert.NoError(t, err)
 
 		router.ServeHTTP(rr, request)
@@ -74,7 +74,7 @@ func TestMe(t *testing.T) {
 			UserService: mockUserService,
 		})
 
-		request, err := http.NewRequest(http.MethodGet, "/v1/me", nil)
+		request, err := http.NewRequest(http.MethodGet, "/me", nil)
 		assert.NoError(t, err)
 
 		router.ServeHTTP(rr, request)
@@ -103,7 +103,7 @@ func TestMe(t *testing.T) {
 			UserService: mockUserService,
 		})
 
-		request, err := http.NewRequest(http.MethodGet, "/v1/me", nil)
+		request, err := http.NewRequest(http.MethodGet, "/me", nil)
 		assert.NoError(t, err)
 
 		router.ServeHTTP(rr, request)

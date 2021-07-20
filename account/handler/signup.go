@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/FuZhouJohn/memrizr/account/model"
@@ -16,6 +17,8 @@ type signupReq struct {
 func (h *Handler) Signup(c *gin.Context) {
 	var req signupReq
 
+	fmt.Println(c.Request)
+
 	if ok := bindData(c, &req); !ok {
 		return
 	}
@@ -27,7 +30,7 @@ func (h *Handler) Signup(c *gin.Context) {
 
 	err := h.UserService.Signup(c, u)
 	if err != nil {
-		log.Panicf("注册用户失败：%v\n", err.Error())
+		log.Printf("注册用户失败：%v\n", err.Error())
 		c.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})

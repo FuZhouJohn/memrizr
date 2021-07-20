@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -19,14 +18,11 @@ type Config struct {
 }
 
 func NewHandler(c *Config) {
-	fmt.Println(c)
 
 	h := &Handler{
 		UserService: c.UserService,
 	}
-
-	g := c.R.Group(fmt.Sprintf("%s/v1", os.Getenv("ACCOUNT_API_URL")))
-
+	g := c.R.Group(os.Getenv("ACCOUNT_API_URL"))
 	g.GET("/me", h.Me)
 	g.POST("/signup", h.Signup)
 	g.POST("/signin", h.Signin)
@@ -37,8 +33,6 @@ func NewHandler(c *Config) {
 	g.PUT("/details", h.Details)
 
 }
-
-
 
 func (h *Handler) Signin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
