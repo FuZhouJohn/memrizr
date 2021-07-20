@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/FuZhouJohn/memrizr/account/model"
+	"github.com/FuZhouJohn/memrizr/account/model/apperrors"
 	"github.com/google/uuid"
 )
 
@@ -27,5 +29,18 @@ func (s *UserService) Get(ctx context.Context, uid uuid.UUID) (*model.User, erro
 }
 
 func (s *UserService) Signup(ctx context.Context, u *model.User) error {
-	panic("方法未实现")
+	pw, err := hashPassword(u.Password)
+
+	if err != nil {
+		log.Printf("无法注册用户的电子邮件: %v\n", u.Email)
+		return apperrors.NewInternal()
+	}
+
+	u.Password = pw
+
+	if err := s.UserRepository.Creat(ctx, u); err != nil {
+		return err
+	}
+
+	return nil
 }
