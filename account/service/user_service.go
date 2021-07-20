@@ -25,3 +25,7 @@ func (s *UserService) Get(ctx context.Context, uid uuid.UUID) (*model.User, erro
 	u, err := s.UserRepository.FindByID(ctx, uid)
 	return u, err
 }
+
+func (s *UserService) Signup(ctx context.Context, u *model.User) error {
+	panic("方法未实现")
+}
