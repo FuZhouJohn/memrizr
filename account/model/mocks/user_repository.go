@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockUserRespository struct {
+type MockUserRepository struct {
 	mock.Mock
 }
 
-func (m *MockUserRespository) FindByID(ctx context.Context, uid uuid.UUID) (*model.User, error) {
+func (m *MockUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.User, error) {
 	ret := m.Called(ctx, uid)
 
 	var r0 *model.User
@@ -28,7 +28,7 @@ func (m *MockUserRespository) FindByID(ctx context.Context, uid uuid.UUID) (*mod
 	return r0, r1
 }
 
-func (m *MockUserRespository) Create(ctx context.Context, u *model.User) error {
+func (m *MockUserRepository) Create(ctx context.Context, u *model.User) error {
 	ret := m.Called(ctx, u)
 
 	var r0 error
