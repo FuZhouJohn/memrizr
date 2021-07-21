@@ -3,6 +3,7 @@ module github.com/FuZhouJohn/memrizr/account
 go 1.16
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-playground/validator/v10 v10.7.0
 	github.com/golang/protobuf v1.5.2 // indirect
