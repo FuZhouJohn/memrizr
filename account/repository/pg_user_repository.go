@@ -11,17 +11,17 @@ import (
 	"github.com/lib/pq"
 )
 
-type PGUserRepository struct {
+type pgUserRepository struct {
 	DB *sqlx.DB
 }
 
 func NewUserRepository(db *sqlx.DB) model.UserRepository {
-	return &PGUserRepository{
+	return &pgUserRepository{
 		DB: db,
 	}
 }
 
-func (r *PGUserRepository) Create(ctx context.Context, u *model.User) error {
+func (r *pgUserRepository) Create(ctx context.Context, u *model.User) error {
 	query := "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *"
 
 	if err := r.DB.Get(u, query, u.Email, u.Password); err != nil {
@@ -36,7 +36,7 @@ func (r *PGUserRepository) Create(ctx context.Context, u *model.User) error {
 	return nil
 }
 
-func (r *PGUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.User, error) {
+func (r *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.User, error) {
 	user := &model.User{}
 
 	query := "SELECT * FROM users WHERE uid=$1"

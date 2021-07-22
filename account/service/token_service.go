@@ -9,7 +9,7 @@ import (
 	"github.com/FuZhouJohn/memrizr/account/model/apperrors"
 )
 
-type TokenService struct {
+type tokenService struct {
 	PrivKey       *rsa.PrivateKey
 	PubKey        *rsa.PublicKey
 	RefreshSecret string
@@ -22,14 +22,14 @@ type TSConfig struct {
 }
 
 func NewTokenService(c *TSConfig) model.TokenService {
-	return &TokenService{
+	return &tokenService{
 		PrivKey:       c.PrivKey,
 		PubKey:        c.PubKey,
 		RefreshSecret: c.RefreshSecret,
 	}
 }
 
-func (s *TokenService) NewPairFromUser(ctx context.Context, u *model.User, prevTokenID string) (*model.TokenPair, error) {
+func (s *tokenService) NewPairFromUser(ctx context.Context, u *model.User, prevTokenID string) (*model.TokenPair, error) {
 	idToken, err := generateIDToken(u, s.PrivKey)
 
 	if err != nil {
