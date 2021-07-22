@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/FuZhouJohn/memrizr/account/handler"
 	"github.com/FuZhouJohn/memrizr/account/repository"
@@ -51,10 +52,25 @@ func inject(d *dataSources) (*gin.Engine, error) {
 	// load refresh token secret from env variable
 	refreshSecret := os.Getenv("REFRESH_SECRET")
 
+	idTokenExp := os.Getenv("ID_TOKEN_EXP")
+	refreshTokenExp := os.Getenv("REFRESH_TOKEN_EXP")
+
+	idExp, err := strconv.ParseInt(idTokenExp, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("无法将 ID_TOKEN_EXP 转换为整数：%w", err)
+	}
+
+	refreshExp, err := strconv.ParseInt(refreshTokenExp, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("无法将 REFRESH_TOKEN_EXP 转换为整数：%w", err)
+	}
+
 	tokenService := service.NewTokenService(&service.TSConfig{
-		PrivKey:       privKey,
-		PubKey:        pubKey,
-		RefreshSecret: refreshSecret,
+		PrivKey:               privKey,
+		PubKey:                pubKey,
+		RefreshSecret:         refreshSecret,
+		IDExpirationSecs:      idExp,
+		RefreshExpirationSecs: refreshExp,
 	})
 
 	baseURL := os.Getenv("ACCOUNT_API_URL")
