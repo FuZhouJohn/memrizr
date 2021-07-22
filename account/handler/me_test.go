@@ -29,7 +29,7 @@ func TestMe(t *testing.T) {
 		}
 
 		mockUserService := new(mocks.MockUserService)
-		mockUserService.On("Get", mock.AnythingOfType("*gin.Context"), uid).Return(mockUserResp, nil)
+		mockUserService.On("Get", mock.AnythingOfType("*context.emptyCtx"), uid).Return(mockUserResp, nil)
 
 		rr := httptest.NewRecorder()
 
@@ -87,7 +87,7 @@ func TestMe(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUserService := new(mocks.MockUserService)
-		mockUserService.On("Get", mock.AnythingOfType("*gin.Context"), uid).Return(nil, fmt.Errorf("Some error down call chain"))
+		mockUserService.On("Get", mock.AnythingOfType("*context.emptyCtx"), uid).Return(nil, fmt.Errorf("Some error down call chain"))
 
 		rr := httptest.NewRecorder()
 

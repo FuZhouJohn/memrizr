@@ -24,7 +24,7 @@ func NewUserRepository(db *sqlx.DB) model.UserRepository {
 func (r *pgUserRepository) Create(ctx context.Context, u *model.User) error {
 	query := "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *"
 
-	if err := r.DB.Get(u, query, u.Email, u.Password); err != nil {
+	if err := r.DB.GetContext(ctx, u, query, u.Email, u.Password); err != nil {
 		if err, ok := err.(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 			log.Printf("无法使用该邮箱创建用户：%v。原因是：%v\n", u.Email, err.Code.Name())
 			return apperrors.NewConflict("email", u.Email)
@@ -41,7 +41,7 @@ func (r *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.
 
 	query := "SELECT * FROM users WHERE uid=$1"
 
-	if err := r.DB.Get(user, query, uid); err != nil {
+	if err := r.DB.GetContext(ctx, user, query, uid); err != nil {
 		return user, apperrors.NewNotFound("uid", uid.String())
 	}
 

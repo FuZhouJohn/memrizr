@@ -29,7 +29,8 @@ func (h *Handler) Signup(c *gin.Context) {
 		Password: req.Password,
 	}
 
-	err := h.UserService.Signup(c, u)
+	ctx := c.Request.Context()
+	err := h.UserService.Signup(ctx, u)
 	if err != nil {
 		log.Printf("注册用户失败：%v\n", err.Error())
 		c.JSON(apperrors.Status(err), gin.H{
@@ -38,7 +39,7 @@ func (h *Handler) Signup(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.TokenService.NewPairFromUser(c, u, "")
+	tokens, err := h.TokenService.NewPairFromUser(ctx, u, "")
 
 	if err != nil {
 		log.Printf("创建用户令牌失败：%v\n", err.Error())
