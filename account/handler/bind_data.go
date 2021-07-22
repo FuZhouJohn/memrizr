@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/FuZhouJohn/memrizr/account/model/apperrors"
@@ -16,6 +17,18 @@ type invalidArgument struct {
 }
 
 func bindData(c *gin.Context, req interface{}) bool {
+	if c.ContentType() != "application/json" {
+		msg := fmt.Sprintf("%s 只接收 Content-Type 为 application/json", c.FullPath())
+
+		err := apperrors.NewUnsupportedMediaType(msg)
+
+		c.JSON(err.Status(), gin.H{
+			"error": err,
+		})
+
+		return false
+	}
+
 	if err := c.ShouldBind(req); err != nil {
 		log.Printf("绑定数据错误：%+v\n", err)
 		if errs, ok := err.(validator.ValidationErrors); ok {
