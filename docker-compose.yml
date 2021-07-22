@@ -35,6 +35,7 @@ services:
       - "8080"
     labels: 
       - "traefik.enable=true"
+      - "traefik.http.services.account.loadbalancer.server.port=8080"
       - "traefik.http.routers.account.rule=Host(`malcorp.test`) && PathPrefix(`/api/account`)"
     environment: 
       - ENV=dev
