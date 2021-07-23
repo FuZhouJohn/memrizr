@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/FuZhouJohn/memrizr/account/handler"
 	"github.com/FuZhouJohn/memrizr/account/repository"
@@ -75,14 +76,22 @@ func inject(d *dataSources) (*gin.Engine, error) {
 		RefreshExpirationSecs: refreshExp,
 	})
 
-	baseURL := os.Getenv("ACCOUNT_API_URL")
 	router := gin.Default()
 
+	baseURL := os.Getenv("ACCOUNT_API_URL")
+
+	handlerTimeout := os.Getenv("HANDLER_TIMEOUT")
+	ht, err := strconv.ParseInt(handlerTimeout, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("无法将 HANDLER_TIMEOUT 转为为整数：%w", err)
+	}
+
 	handler.NewHandler(&handler.Config{
-		R:            router,
-		UserService:  userService,
-		TokenService: tokenService,
-		BaseURL:      baseURL,
+		R:               router,
+		UserService:     userService,
+		TokenService:    tokenService,
+		BaseURL:         baseURL,
+		TimeoutDuration: time.Duration(time.Duration(ht) * time.Second),
 	})
 
 	return router, nil

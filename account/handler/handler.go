@@ -2,8 +2,11 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/FuZhouJohn/memrizr/account/handler/middleware"
 	"github.com/FuZhouJohn/memrizr/account/model"
+	"github.com/FuZhouJohn/memrizr/account/model/apperrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,10 +16,11 @@ type Handler struct {
 }
 
 type Config struct {
-	R            *gin.Engine
-	UserService  model.UserService
-	TokenService model.TokenService
-	BaseURL      string
+	R               *gin.Engine
+	UserService     model.UserService
+	TokenService    model.TokenService
+	BaseURL         string
+	TimeoutDuration time.Duration
 }
 
 func NewHandler(c *Config) {
@@ -26,6 +30,10 @@ func NewHandler(c *Config) {
 		TokenService: c.TokenService,
 	}
 	g := c.R.Group(c.BaseURL)
+	if gin.Mode() != gin.TestMode {
+		g.Use(middleware.Timeout(c.TimeoutDuration, apperrors.NewServiceUnavailable()))
+	}
+
 	g.GET("/me", h.Me)
 	g.POST("/signup", h.Signup)
 	g.POST("/signin", h.Signin)
