@@ -9,14 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type signupReq struct {
+type signinReq struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,gte=6,lte=30"`
 }
 
-func (h *Handler) Signup(c *gin.Context) {
-	var req signupReq
-
+func (h *Handler) Signin(c *gin.Context) {
+	var req signinReq
 	if ok := bindData(c, &req); !ok {
 		return
 	}
@@ -27,9 +26,10 @@ func (h *Handler) Signup(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-	err := h.UserService.Signup(ctx, u)
+	err := h.UserService.Signin(ctx, u)
+
 	if err != nil {
-		log.Printf("注册用户失败：%v\n", err.Error())
+		log.Printf("用户登录失败：%v\n", err.Error())
 		c.JSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
@@ -37,7 +37,6 @@ func (h *Handler) Signup(c *gin.Context) {
 	}
 
 	tokens, err := h.TokenService.NewPairFromUser(ctx, u, "")
-
 	if err != nil {
 		log.Printf("创建用户令牌失败：%v\n", err.Error())
 
@@ -47,7 +46,7 @@ func (h *Handler) Signup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"tokens": tokens,
 	})
 }

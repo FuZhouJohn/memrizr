@@ -45,12 +45,6 @@ func NewHandler(c *Config) {
 
 }
 
-func (h *Handler) Signin(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"hello": "it's signin",
-	})
-}
-
 func (h *Handler) Signout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"hello": "it's signout",
