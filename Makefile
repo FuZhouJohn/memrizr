@@ -1,8 +1,7 @@
-.PHONY: keypair migrate-create migrate-up migrate-down migrate-force
+.PHONY: keypair migrate-create migrate-up migrate-down migrate-force init
 
 PWD = $(shell pwd)
 ACCTPATH = $(PWD)/account
-MPATH = $(ACCTPATH)/migrations
 PORT = 5432
 
 # 默认执行向上或向下迁移的次数
@@ -15,13 +14,23 @@ create-keypair:
 
 migrate-create:
 	@echo "---Creating migrate files---"
-	migrate create -ext sql -dir $(MPATH) -seq -digits 5 $(NAME)
+	migrate create -ext sql -dir $(PWD)/$(APPPATH)/migrations -seq -digits 5 $(NAME)
 	
 migrate-up:
-	migrate -source file://$(MPATH) -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable up $(N)
+	migrate -source file://$(PWD)/$(APPPATH)/migrations -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable up $(N)
 
 migrate-down:
-	migrate -source file://$(MPATH) -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable down $(N)
+	migrate -source file://$(PWD)/$(APPPATH)/migrations -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable down $(N)
 
 migrate-force:
-	migrate -source file://$(MPATH) -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable force $(VERSION)
+	migrate -source file://$(PWD)/$(APPPATH)/migrations -database postgres://postgres:password@localhost:$(PORT)/postgres?sslmode=disable force $(VERSION)
+
+
+
+init:
+	docker-compose up -d postgres-account && \
+	$(MAKE) create-keypair ENV=dev && \
+	$(MAKE) create-keypair ENV=test && \
+	$(MAKE) migrate-down APPPATH=account N= && \
+	$(MAKE) migrate-up APPPATH=account N= && \
+	docker-compose down
