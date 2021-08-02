@@ -46,5 +46,20 @@ func (s *userService) Signup(ctx context.Context, u *model.User) error {
 }
 
 func (s *userService) Signin(ctx context.Context, u *model.User) error {
-	panic("未实现")
+	uFetched, err := s.UserRepository.FindByEmail(ctx, u.Email)
+	if err != nil {
+		return apperrors.NewAuthorization("用户名或密码错误")
+	}
+
+	match, err := comparePasswords(uFetched.Password, u.Password)
+	if err != nil {
+		return apperrors.NewInternal()
+	}
+
+	if !match {
+		return apperrors.NewAuthorization("用户名或密码错误")
+	}
+
+	u = uFetched
+	return nil
 }
