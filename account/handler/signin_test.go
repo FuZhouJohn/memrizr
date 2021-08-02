@@ -82,4 +82,105 @@ func TestSignin(t *testing.T) {
 		mockUserService.AssertCalled(t, "Signin", mockUSArgs...)
 		mockTokenService.AssertNotCalled(t, "NewTokensFromUser")
 	})
+
+	t.Run("创建 Token 成功", func(t *testing.T) {
+		email := "zhuang@test.com"
+		password := "testpassword2"
+
+		mockUSArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			&model.User{Email: email, Password: password},
+		}
+
+		mockUserService.On("Signin", mockUSArgs...).Return(nil)
+
+		mockTSArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			&model.User{
+				Email:    email,
+				Password: password,
+			},
+			"",
+		}
+		mockTokenPair := &model.TokenPair{
+			IDToken:      "idToken",
+			RefreshToken: "refreshToken",
+		}
+
+		mockTokenService.On("NewPairFromUser", mockTSArgs...).Return(mockTokenPair, nil)
+
+		rr := httptest.NewRecorder()
+
+		reqBody, err := json.Marshal(gin.H{
+			"email":    email,
+			"password": password,
+		})
+		assert.NoError(t, err)
+
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		assert.NoError(t, err)
+
+		request.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(rr, request)
+
+		respBody, err := json.Marshal(gin.H{
+			"tokens": mockTokenPair,
+		})
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, respBody, rr.Body.Bytes())
+
+		mockUserService.AssertCalled(t, "Signin", mockUSArgs...)
+		mockTokenService.AssertCalled(t, "NewPairFromUser", mockTSArgs...)
+	})
+
+	t.Run("创建 Token 失败", func(t *testing.T) {
+		email := "zhuang@test.com"
+		password := "testpassword3"
+
+		mockUSArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			&model.User{Email: email, Password: password},
+		}
+
+		mockUserService.On("Signin", mockUSArgs...).Return(nil)
+
+		mockTSArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			&model.User{
+				Email:    email,
+				Password: password,
+			},
+			"",
+		}
+		mockError := apperrors.NewInternal()
+
+		mockTokenService.On("NewPairFromUser", mockTSArgs...).Return(nil, mockError)
+
+		rr := httptest.NewRecorder()
+
+		reqBody, err := json.Marshal(gin.H{
+			"email":    email,
+			"password": password,
+		})
+		assert.NoError(t, err)
+
+		request, err := http.NewRequest(http.MethodPost, "/signin", bytes.NewBuffer(reqBody))
+		assert.NoError(t, err)
+
+		request.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(rr, request)
+
+		respBody, err := json.Marshal(gin.H{
+			"error": mockError,
+		})
+		assert.NoError(t, err)
+
+		assert.Equal(t, mockError.Status(), rr.Code)
+		assert.Equal(t, respBody, rr.Body.Bytes())
+
+		mockUserService.AssertCalled(t, "Signin", mockUSArgs...)
+		mockTokenService.AssertCalled(t, "NewPairFromUser", mockTSArgs...)
+	})
 }
