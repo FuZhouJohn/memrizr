@@ -28,7 +28,7 @@ func initDS() (*dataSources, error) {
 
 	pgConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", pgHost, pgPort, pgUser, pgPassword, pgDB, pgSSL)
 
-	log.Printf("正在连接 Postgresql\n")
+	log.Printf("开始连接 Postgresql\n")
 	db, err := sqlx.Open("postgres", pgConnString)
 
 	if err != nil {
@@ -38,6 +38,7 @@ func initDS() (*dataSources, error) {
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("连接数据库出错：%w", err)
 	}
+	log.Printf("连接成功...\n")
 
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PROT")
@@ -53,6 +54,7 @@ func initDS() (*dataSources, error) {
 	if err != nil {
 		return nil, fmt.Errorf("连接 Redis 失败：%w", err)
 	}
+	log.Printf("连接成功...\n")
 
 	return &dataSources{
 		DB:          db,
