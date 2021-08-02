@@ -47,3 +47,16 @@ func (r *pgUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.
 
 	return user, nil
 }
+
+func (r *pgUserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+	user := &model.User{}
+
+	query := "SELECT * FROM users WHERE email=$1"
+
+	if err := r.DB.GetContext(ctx, user, query, email); err != nil {
+		log.Printf("未找到邮箱为 %v 的用户，错误：%v\n", email, err)
+		return user, apperrors.NewNotFound("email", email)
+	}
+
+	return user, nil
+}
