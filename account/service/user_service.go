@@ -60,6 +60,6 @@ func (s *userService) Signin(ctx context.Context, u *model.User) error {
 		return apperrors.NewAuthorization("用户名或密码错误")
 	}
 
-	u = uFetched
+	*u = *uFetched
 	return nil
 }
