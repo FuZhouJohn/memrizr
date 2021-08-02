@@ -57,11 +57,11 @@ func TestGet(t *testing.T) {
 }
 
 func TestSignup(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
+	t.Run("成功", func(t *testing.T) {
 		uid, _ := uuid.NewRandom()
 
 		mockUser := &model.User{
-			Email:    "hello@world.com",
+			Email:    "hello@world1.com",
 			Password: "testpassword",
 		}
 
@@ -86,7 +86,7 @@ func TestSignup(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockUser := &model.User{
-			Email:    "hello@world.com",
+			Email:    "hello@world2.com",
 			Password: "testpassword",
 		}
 
@@ -107,5 +107,74 @@ func TestSignup(t *testing.T) {
 		assert.EqualError(t, err, mockErr.Error())
 
 		mockUserRepository.AssertExpectations(t)
+	})
+}
+
+func TestSignin(t *testing.T) {
+	email := "hello@world2.com"
+	vaildPW := "zhuangjinan"
+	hashedVaildPW, _ := hashPassword(vaildPW)
+	invalidPW := "zhuangjibei"
+
+	mockeUserRepository := new(mocks.MockUserRepository)
+	us := NewUserService(&USConfig{
+		UserRepository: mockeUserRepository,
+	})
+
+	t.Run("成功", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			Email:    email,
+			Password: vaildPW,
+		}
+
+		mockUserResp := &model.User{
+			UID:      uid,
+			Email:    email,
+			Password: hashedVaildPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			email,
+		}
+
+		mockeUserRepository.On("FindByEmail", mockArgs...).Return(mockUserResp, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.NoError(t, err)
+		mockeUserRepository.AssertCalled(t, "FindByEmail", mockArgs...)
+	})
+
+	t.Run("无效的电子邮件/密码组合", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			Email:    email,
+			Password: invalidPW,
+		}
+
+		mockUserResp := &model.User{
+			UID:      uid,
+			Email:    email,
+			Password: hashedVaildPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			email,
+		}
+
+		mockeUserRepository.On("FindByEmail", mockArgs...).Return(mockUserResp, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "用户名或密码错误")
+		mockeUserRepository.AssertCalled(t, "FindByEmail", mockArgs...)
 	})
 }
