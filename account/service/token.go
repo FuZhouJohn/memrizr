@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"log"
 	"time"
 
@@ -81,4 +82,28 @@ func generateRefreshToken(uid uuid.UUID, refreshSecret string, exp int64) (*Refr
 		ID:        tokenID.String(),
 		ExpiresIn: tokenExp.Sub(currentTime),
 	}, nil
+}
+
+func validateIDToken(tokenString string, key *rsa.PublicKey) (*IDTokenCustomClaims, error) {
+	claims := &IDTokenCustomClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("ID 令牌无效")
+	}
+
+	claims, ok := token.Claims.(*IDTokenCustomClaims)
+
+	if !ok {
+		return nil, fmt.Errorf("ID 令牌有效，但无法解析 claims")
+	}
+
+	return claims, nil
 }
